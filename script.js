@@ -27,31 +27,21 @@ function calculateMousePos(evt){
   };
 }
 
-// MAIN METHOD
-window.onload = function() { // as soon as page loads run this code
-  canvas = document.getElementById('gameCanvas');
-  canvasContext = canvas.getContext('2d'); // necessary to draw on canvas
+// event that fires when the mouse is click at the pause screen
+  function handleMouseClick(evt){
+    if(showingWinScreen){
+      player1Score = 0;
+      player2Score = 0;
+      showingWinScreen = false;
 
-  var framesPerSecond = 30;
-  setInterval(function(){
-      moveEverything();
-      drawEverything();
-  }, 1000/framesPerSecond); // use to calculate our frame rates.
-
-// event listener to detect mouse movement and assigning y position to left paddle
-  canvas.addEventListener('mousemove',
-    function(evt){
-      var mousePos = calculateMousePos(evt);
-      paddle1Y = mousePos.y - PADDLE_HEIGHT/2;
-  });
-
-}
+    }
+  }
 
 // function to reset the ball's position back to center
 function ballReset(){
   ballX = canvas.width/2;
   ballY = canvas.height/2;
-  ballSpeedX = -ballSpeedX; // flipping horizontal direction to bounce inside canvas
+  ballSpeedX = -ballSpeedX; // flipping horizontal direction of ball movement
 }
 
 //  function for the AI movement of the computer's paddle2Y
@@ -67,8 +57,9 @@ function computerMovement(){
   }
 }
 
+// function to move left paddle, ball, and call for computer movement as well.
 function moveEverything(){
-  // if winning score game comes to a pause
+  // if winning score is reach, game comes to a pause screen
   if(showingWinScreen){
     canvasContext.fillStyle = 'white';
     canvasContext.fillText('GAME OVER, click to play again...', 100, 100);
@@ -77,22 +68,24 @@ function moveEverything(){
 
   computerMovement();
 
-  ballX = ballX + ballSpeedX;
-  ballY = ballY + ballSpeedY;
+  ballX += ballSpeedX;
+  ballY += ballSpeedY;
 
 // left wall
   if(ballX < 0){
+    // if left paddle hits the ball change its direction of movement
     if(ballY > paddle1Y && ballY < paddle1Y+PADDLE_HEIGHT){
       ballSpeedX = -ballSpeedX;
-
+    // vertical velocity of ball is faster if it hits either corner of left paddle.
       var deltaY = ballY - (paddle1Y + PADDLE_HEIGHT/2);
       ballSpeedY = deltaY * 0.25;
 
     } else {
+      // if ball hits left wall, right player gets a point.
       player2Score++;
+      // check to see if either player has reach a winning score,
+      // if so, enter a pause screen.
       if(player2Score >= WINNING_SCORE || player1Score >= WINNING_SCORE){
-        player1Score = 0;
-        player2Score = 0;
         showingWinScreen = true;
       }
       ballReset();
@@ -113,8 +106,6 @@ function moveEverything(){
     } else {
       player1Score++;
       if(player2Score >= WINNING_SCORE || player1Score >= WINNING_SCORE){
-        player1Score = 0;
-        player2Score = 0;
         showingWinScreen = true;
       }
       ballReset();
@@ -123,16 +114,35 @@ function moveEverything(){
 
 }
 
+function drawNet(){
+  for(var i=4; i<canvas.height; i += 40){
+    colorRect(canvas.width/2+10, i, 2,20,"white"); // middle of canvas, topY, width, height, color
+  }
+}
+
+
 function drawEverything(){
   // gives the canvas screen a black color
   colorRect(0,0, canvas.width, canvas.height, 'black');
 
-  // if winning score game comes to a pause
+  // if winning score game comes to a pause and declare winner.
   if(showingWinScreen){
     canvasContext.fillStyle = 'white';
-    canvasContext.fillText("GAME OVER, click to play again...", 100, 100);
+    if(player1Score >= WINNING_SCORE){
+      canvasContext.fillText("Left player wins!", 350, 300);
+    } else {
+      canvasContext.fillText("Right player wins!", 350, 300);
+    }
+    canvasContext.fillText("Click to play again...", 350, 400);
+    // writes the label "score" to canvas
+    canvasContext.fillStyle = 'yellow';
+    canvasContext.fillText(player1Score, 100,100);
+    canvasContext.fillText(player2Score, canvas.width-100,100);
     return;
   }
+
+  // net
+  drawNet();
   // left player paddle
   colorRect(2,paddle1Y,PADDLE_THICKNESS,PADDLE_HEIGHT,'white');
 
@@ -162,4 +172,27 @@ function colorCircle(centerX, centerY, radius, drawColor){
 function colorRect(leftX, topY, width, height, drawColor){
   canvasContext.fillStyle = drawColor;
   canvasContext.fillRect(leftX, topY, width, height); // (x-coor,y-coor,width,height)
+}
+
+
+// MAIN METHOD
+window.onload = function() { // as soon as page loads run this code
+  canvas = document.getElementById('gameCanvas');
+  canvasContext = canvas.getContext('2d'); // necessary to draw on canvas
+
+  var framesPerSecond = 30;
+  setInterval(function(){
+      moveEverything();
+      drawEverything();
+  }, 1000/framesPerSecond); // use to calculate our frame rates.
+
+// event listener to detect mouse movement and assigning y position to left paddle
+  canvas.addEventListener('mousemove',
+    function(evt){
+      var mousePos = calculateMousePos(evt);
+      paddle1Y = mousePos.y - PADDLE_HEIGHT/2;
+  });
+
+  canvas.addEventListener('mousedown',handleMouseClick);
+
 }

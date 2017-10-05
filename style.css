@@ -1,0 +1,18 @@
+body{
+  background: yellow;
+}
+.content{
+  width: 100%;
+  background: yellow;
+  text-align: center;
+}
+
+.game-area{
+  width: 740px;
+  background: black;
+  margin: 5% auto;
+}
+
+h1{
+  margin: 5% auto;
+}

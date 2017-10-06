@@ -235,7 +235,7 @@ window.onload = function() { // as soon as page loads run this code
   canvas = document.getElementById('gameCanvas');
   canvasContext = canvas.getContext('2d'); // necessary to draw on canvas
   mySoundBounce = new sound("sounds/bounce_effect.wav");
-  mySoundMissed = new sound("sounds/missed_effect.wav");
+  mySoundMissed = new sound("sounds/missed_effect2.wav");
   mySoundWin = new sound("sounds/winning_effect.wav");
 
   var framesPerSecond = 30;

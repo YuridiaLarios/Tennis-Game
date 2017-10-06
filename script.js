@@ -1,15 +1,17 @@
 var canvas; //empty canvas
 var canvasContext;
 var ballX = 50;
-var ballSpeedX = 9;
+var ballSpeedX = 8;
 var ballY = 50;
-var ballSpeedY = 4;
+var ballSpeedY = 3;
 var paddle1Y = 250;
 var paddle2Y = 250;
 var player1Score = 0;
 var player2Score = 0;
 var showingWelScreen = true;
 var showingWinScreen = false;
+var mySoundBounce;
+var mySoundMissed;
 const PADDLE_HEIGHT = 100;
 const PADDLE_THICKNESS = 10;
 const WINNING_SCORE = 3;
@@ -28,6 +30,8 @@ function calculateMousePos(evt){
   };
 }
 
+
+
 // event that fires when the mouse is click at the pause screen
   function handleMouseClick(evt){
 
@@ -43,6 +47,7 @@ function calculateMousePos(evt){
     }
   }
 
+
 // function to reset the ball's position back to center
 function ballReset(){
   ballX = canvas.width/2;
@@ -57,9 +62,9 @@ function computerMovement(){
   // calculate paddle center
   var paddle2YCenter = paddle2Y + (PADDLE_HEIGHT/2);
   if(paddle2YCenter < ballY - 34){
-    paddle2Y += 7;
+    paddle2Y += 7.5;
   } else if(paddle2YCenter > ballY + 34){
-    paddle2Y -= 7;
+    paddle2Y -= 7.5;
   }
 }
 
@@ -84,17 +89,19 @@ function moveEverything(){
   ballY += ballSpeedY;
 
 // left wall
-  if(ballX < 0){
+  if(ballX > 0 && ballX < PADDLE_THICKNESS + 10){
     // if left paddle hits the ball change its direction of movement
     if(ballY > paddle1Y && ballY < paddle1Y+PADDLE_HEIGHT){
+      mySoundBounce.play();
       ballSpeedX = -ballSpeedX;
     // vertical velocity of ball is faster if it hits either corner of left paddle.
       var deltaY = ballY - (paddle1Y + PADDLE_HEIGHT/2);
       ballSpeedY = deltaY * 0.25;
 
     } else {
+      mySoundMissed.play();
       // if ball hits left wall, right player gets a point.
-      player2Score++;
+    player2Score++;
       // check to see if either player has reach a winning score,
       // if so, enter a pause screen.
       if(player2Score >= WINNING_SCORE || player1Score >= WINNING_SCORE){
@@ -104,18 +111,23 @@ function moveEverything(){
 
     }
   }
-  if(ballY >= canvas.height || ballY <= 0){
-    ballSpeedY = -ballSpeedY; // flipping vertical direction to bounce inside canvas
+
+  // flipping vertical direction to bounce inside canvas
+  if(ballY >= canvas.height-10 || ballY <= 0 +10){
+    ballSpeedY = -ballSpeedY;
   }
 
+
 // right wall
-  if(ballX > canvas.width) {
+  if(ballX > canvas.width- PADDLE_THICKNESS -10) {
     if(ballY > paddle2Y && ballY < paddle2Y+PADDLE_HEIGHT) {
+      mySoundBounce.play();
       ballSpeedX = -ballSpeedX;
 
       var deltaY = ballY - (paddle2Y + PADDLE_HEIGHT/2);
       ballSpeedY = deltaY * 0.25;
-    } else {
+    } else if(ballX > canvas.width) {
+      mySoundMissed.play();
       player1Score++;
       if(player2Score >= WINNING_SCORE || player1Score >= WINNING_SCORE){
         showingWinScreen = true;
@@ -140,19 +152,20 @@ function drawEverything(){
   // welcome screen
     // welcome screen
   if(showingWelScreen){
+    canvasContext.font = "30px Monospace";
     canvasContext.fillStyle = 'white';
-    canvasContext.fillText('WELCOME!... Click to PLAY!', 300, canvas.height/2);
+    canvasContext.fillText('WELCOME!... Click to PLAY!', 150, canvas.height/2);
     return;
   }
   // if winning score game comes to a pause and declare winner.
   if(showingWinScreen){
     canvasContext.fillStyle = 'white';
     if(player1Score >= WINNING_SCORE){
-      canvasContext.fillText("Left player wins!", 320, canvas.height/2);
+      canvasContext.fillText("Left player wins!", 230, canvas.height/2);
     } else {
-      canvasContext.fillText("Computer  wins!", 320, canvas.height/2);
+      canvasContext.fillText("Computer  wins!", 230, canvas.height/2);
     }
-    canvasContext.fillText("Click to play again...", 320, canvas.height/2 +30);
+    canvasContext.fillText("Click to play again...", 190, canvas.height/2 +30);
     // writes the scores to canvas
     canvasContext.fillStyle = 'yellow';
     canvasContext.fillText(player1Score, 100,100);
@@ -193,6 +206,21 @@ function colorRect(leftX, topY, width, height, drawColor){
   canvasContext.fillRect(leftX, topY, width, height); // (x-coor,y-coor,width,height)
 }
 
+function sound(src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.play = function(){
+        this.sound.play();
+    }
+    this.stop = function(){
+        this.sound.pause();
+    }
+}
+
 
 
 
@@ -204,10 +232,12 @@ function colorRect(leftX, topY, width, height, drawColor){
 window.onload = function() { // as soon as page loads run this code
   canvas = document.getElementById('gameCanvas');
   canvasContext = canvas.getContext('2d'); // necessary to draw on canvas
-
+  mySoundBounce = new sound("sounds/bounce_effect.wav");
+  mySoundMissed = new sound("sounds/missed_effect.wav");
 
   var framesPerSecond = 30;
   setInterval(function(){
+
       moveEverything();
       drawEverything();
   }, 1000/framesPerSecond); // use to calculate our frame rates.
@@ -218,7 +248,12 @@ window.onload = function() { // as soon as page loads run this code
       var mousePos = calculateMousePos(evt);
       paddle1Y = mousePos.y - PADDLE_HEIGHT/2;
   });
+  canvas.addEventListener('touchmove', function(evt){
+    var myGameArea = canvas.getBoundingClientRect();
+    paddle1Y = myGameArea.y = e.touches[0].screenY;
+  });
 
   canvas.addEventListener('mousedown',handleMouseClick);
+
 
 }

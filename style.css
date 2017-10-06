@@ -1,18 +1,22 @@
 body{
-  background: yellow;
+  background: #131313;
+
 }
 .content{
   width: 100%;
-  background: yellow;
   text-align: center;
 }
 
 .game-area{
+  position: absolute;
   width: 740px;
   background: black;
-  margin: 5% auto;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -50%);
 }
 
 h1{
+  color: yellow;
   margin: 5% auto;
 }

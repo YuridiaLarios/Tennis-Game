@@ -12,6 +12,7 @@ var showingWelScreen = true;
 var showingWinScreen = false;
 var mySoundBounce;
 var mySoundMissed;
+var mySoundWin;
 const PADDLE_HEIGHT = 100;
 const PADDLE_THICKNESS = 10;
 const WINNING_SCORE = 3;
@@ -166,6 +167,7 @@ function drawEverything(){
       canvasContext.fillText("Computer  wins!", 230, canvas.height/2);
     }
     canvasContext.fillText("Click to play again...", 190, canvas.height/2 +30);
+    return;
     // writes the scores to canvas
     canvasContext.fillStyle = 'yellow';
     canvasContext.fillText(player1Score, 100,100);
@@ -234,6 +236,7 @@ window.onload = function() { // as soon as page loads run this code
   canvasContext = canvas.getContext('2d'); // necessary to draw on canvas
   mySoundBounce = new sound("sounds/bounce_effect.wav");
   mySoundMissed = new sound("sounds/missed_effect.wav");
+  mySoundWin = new sound("sounds/winning_effect.wav");
 
   var framesPerSecond = 30;
   setInterval(function(){

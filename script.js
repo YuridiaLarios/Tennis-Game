@@ -253,7 +253,7 @@ window.onload = function() { // as soon as page loads run this code
   });
   canvas.addEventListener('touchmove', function(evt){
     var myGameArea = canvas.getBoundingClientRect();
-    paddle1Y = myGameArea.y = e.touches[0].screenY;
+    paddle1Y = myGameArea.y = evt.touches[0].screenY;
   });
 
   canvas.addEventListener('mousedown',handleMouseClick);

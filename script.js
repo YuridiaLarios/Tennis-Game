@@ -17,9 +17,13 @@ const PADDLE_HEIGHT = 100;
 const PADDLE_THICKNESS = 10;
 const WINNING_SCORE = 3;
 
+
+
+
+
 // event that fires everytime the mouse moves
 function calculateMousePos(evt){
-  var rect = canvas.getBoundingClientRect(); // black rectangle area
+  var rect = canvas.getBoundingClientRect(); // black game area
   var root = document.documentElement;
   // taking position of mouse within playing space.
   var mouseX = evt.clientX - rect.left - root.scrollLeft;
@@ -33,20 +37,23 @@ function calculateMousePos(evt){
 
 
 
+
+
 // event that fires when the mouse is click at the pause screen
-  function handleMouseClick(evt){
-
+function handleMouseClick(evt){
   if(showingWinScreen){
-      player1Score = 0;
-      player2Score = 0;
-      showingWinScreen = false;
-
-    }
-        if(showingWelScreen){
-      ballReset();
-      showingWelScreen = false;
-    }
+    player1Score = 0;
+    player2Score = 0;
+    showingWinScreen = false;
   }
+  if(showingWelScreen){
+    ballReset();
+    showingWelScreen = false;
+  }
+}
+
+
+
 
 
 // function to reset the ball's position back to center
@@ -55,6 +62,10 @@ function ballReset(){
   ballY = canvas.height/2;
   ballSpeedX = -ballSpeedX; // flipping horizontal direction of ball movement
 }
+
+
+
+
 
 //  function for the AI movement of the computer's paddle2Y
 //  It ignores chasing the ball while it's within 34 pixels above or
@@ -89,7 +100,7 @@ function moveEverything(){
   ballX += ballSpeedX;
   ballY += ballSpeedY;
 
-// left wall
+  // left wall
   if(ballX > 0 && ballX < PADDLE_THICKNESS + 10){
     // if left paddle hits the ball change its direction of movement
     if(ballY > paddle1Y && ballY < paddle1Y+PADDLE_HEIGHT){
@@ -98,18 +109,16 @@ function moveEverything(){
     // vertical velocity of ball is faster if it hits either corner of left paddle.
       var deltaY = ballY - (paddle1Y + PADDLE_HEIGHT/2);
       ballSpeedY = deltaY * 0.25;
-
     } else {
       mySoundMissed.play();
       // if ball hits left wall, right player gets a point.
-    player2Score++;
+      player2Score++;
       // check to see if either player has reach a winning score,
       // if so, enter a pause screen.
       if(player2Score >= WINNING_SCORE || player1Score >= WINNING_SCORE){
         showingWinScreen = true;
       }
       ballReset();
-
     }
   }
 
@@ -139,11 +148,18 @@ function moveEverything(){
 
 }
 
+
+
+
+
 function drawNet(){
   for(var i=4; i<canvas.height; i += 40){
     colorRect(canvas.width/2+10, i, 2,20,"white"); // middle of canvas, topY, width, height, color
   }
 }
+
+
+
 
 
 function drawEverything(){
@@ -194,6 +210,10 @@ function drawEverything(){
 
 }
 
+
+
+
+
 // helper function to draw a circle
 function colorCircle(centerX, centerY, radius, drawColor){
   canvasContext.fillStyle = drawColor;
@@ -202,12 +222,20 @@ function colorCircle(centerX, centerY, radius, drawColor){
   canvasContext.fill();
 }
 
+
+
+
+
 // helper function to draw a rectangle
 function colorRect(leftX, topY, width, height, drawColor){
   canvasContext.fillStyle = drawColor;
   canvasContext.fillRect(leftX, topY, width, height); // (x-coor,y-coor,width,height)
 }
 
+
+
+
+// function to build sound objects
 function sound(src) {
     this.sound = document.createElement("audio");
     this.sound.src = src;
@@ -222,9 +250,6 @@ function sound(src) {
         this.sound.pause();
     }
 }
-
-
-
 
 
 
@@ -245,12 +270,13 @@ window.onload = function() { // as soon as page loads run this code
       drawEverything();
   }, 1000/framesPerSecond); // use to calculate our frame rates.
 
-// event listener to detect mouse movement and assigning y position to left paddle
+  // event listener to detect mouse movement and assigning y position to left paddle
   canvas.addEventListener('mousemove',
     function(evt){
       var mousePos = calculateMousePos(evt);
       paddle1Y = mousePos.y - PADDLE_HEIGHT/2;
   });
+
   canvas.addEventListener('touchmove', function(evt){
     var myGameArea = canvas.getBoundingClientRect();
     paddle1Y = myGameArea.y = evt.touches[0].screenY;
@@ -258,5 +284,5 @@ window.onload = function() { // as soon as page loads run this code
 
   canvas.addEventListener('mousedown',handleMouseClick);
 
-
 }
+// END OF SCRIPT

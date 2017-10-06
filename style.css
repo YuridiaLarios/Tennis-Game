@@ -6,6 +6,7 @@ body{
   background: #131313;
 
 }
+
 .content{
   width: 100%;
   text-align: center;
@@ -20,13 +21,14 @@ body{
   transform: translate(54%, -50%);
 }
 
-
-
 h1{
   color: yellow;
   margin: 5% auto;
   margin-left: 4.5%;
 }
+
+
+
 
 
 /**********************************
